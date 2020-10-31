@@ -100,6 +100,7 @@ abstract class MarkdownWidget extends StatefulWidget {
     this.extensionSet,
     this.imageBuilder,
     this.checkboxBuilder,
+    this.blockTags,
     this.builders = const {},
     this.fitContent = false,
   })  : assert(data != null),
@@ -141,6 +142,9 @@ abstract class MarkdownWidget extends StatefulWidget {
 
   /// Collection of custom inline syntax types to be used parsing the Markdown data.
   final List<md.InlineSyntax> inlineSyntaxes;
+
+  /// Collection of custom block tags to be used parsing the Markdown data.
+  final List<String> blockTags;
 
   /// Markdown syntax extension set
   ///
@@ -234,6 +238,7 @@ class _MarkdownWidgetState extends State<MarkdownWidget>
       checkboxBuilder: widget.checkboxBuilder,
       builders: widget.builders,
       fitContent: widget.fitContent,
+      blockTags: widget.blockTags,
     );
 
     _children = builder.build(astNodes);
@@ -294,6 +299,7 @@ class MarkdownBody extends MarkdownWidget {
     String imageDirectory,
     List<md.BlockSyntax> blockSyntaxes,
     List<md.InlineSyntax> inlineSyntaxes,
+    List<String> blockTags,
     md.ExtensionSet extensionSet,
     MarkdownImageBuilder imageBuilder,
     MarkdownCheckboxBuilder checkboxBuilder,
@@ -311,6 +317,7 @@ class MarkdownBody extends MarkdownWidget {
           imageDirectory: imageDirectory,
           blockSyntaxes: blockSyntaxes,
           inlineSyntaxes: inlineSyntaxes,
+          blockTags: blockTags,
           extensionSet: extensionSet,
           imageBuilder: imageBuilder,
           checkboxBuilder: checkboxBuilder,
@@ -357,6 +364,7 @@ class Markdown extends MarkdownWidget {
     String imageDirectory,
     List<md.BlockSyntax> blockSyntaxes,
     List<md.InlineSyntax> inlineSyntaxes,
+    List<String> blockTags,
     md.ExtensionSet extensionSet,
     MarkdownImageBuilder imageBuilder,
     MarkdownCheckboxBuilder checkboxBuilder,
@@ -376,6 +384,7 @@ class Markdown extends MarkdownWidget {
           imageDirectory: imageDirectory,
           blockSyntaxes: blockSyntaxes,
           inlineSyntaxes: inlineSyntaxes,
+          blockTags: blockTags,
           extensionSet: extensionSet,
           imageBuilder: imageBuilder,
           checkboxBuilder: checkboxBuilder,

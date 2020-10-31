@@ -27,7 +27,7 @@ const List<String> _kBlockTags = const <String>[
   'table',
   'thead',
   'tbody',
-  'tr'
+  'tr',
 ];
 
 const List<String> _kListTags = const <String>['ul', 'ol'];
@@ -101,6 +101,7 @@ class MarkdownBuilder implements md.NodeVisitor {
     @required this.checkboxBuilder,
     @required this.builders,
     this.fitContent = false,
+    this.blockTags = const [],
   });
 
   /// A delegate that controls how link and `pre` elements behave.
@@ -128,6 +129,9 @@ class MarkdownBuilder implements md.NodeVisitor {
 
   /// Whether to allow the widget to fit the child content.
   final bool fitContent;
+
+  /// Collection of custom block tags to be used parsing the Markdown data.
+  final List<String> blockTags;
 
   final List<String> _listIndents = <String>[];
   final List<_BlockElement> _blocks = <_BlockElement>[];
@@ -180,7 +184,7 @@ class MarkdownBuilder implements md.NodeVisitor {
     }
 
     var start;
-    if (_isBlockTag(tag)) {
+    if (_isBlockTag(tag) || blockTags.contains(tag)) {
       _addAnonymousBlockIfNeeded();
       if (_isListTag(tag)) {
         _listIndents.add(tag);
@@ -288,7 +292,7 @@ class MarkdownBuilder implements md.NodeVisitor {
   void visitElementAfter(md.Element element) {
     final String tag = element.tag;
 
-    if (_isBlockTag(tag)) {
+    if (_isBlockTag(tag) || blockTags.contains(tag)) {
       _addAnonymousBlockIfNeeded();
 
       final _BlockElement current = _blocks.removeLast();
@@ -357,6 +361,10 @@ class MarkdownBuilder implements md.NodeVisitor {
         );
       } else if (tag == 'hr') {
         child = Container(decoration: styleSheet.horizontalRuleDecoration);
+      } else if (builders.containsKey(tag)) {
+        final builder = builders[tag];
+        child = builder.visitElementAfter(element, styleSheet.styles[tag]) ??
+            const SizedBox();
       }
 
       _addBlockChild(child);
@@ -514,7 +522,7 @@ class MarkdownBuilder implements md.NodeVisitor {
 
     WrapAlignment blockAlignment = WrapAlignment.start;
     TextAlign textAlign = TextAlign.start;
-    if (_isBlockTag(_currentBlockTag)) {
+    if (_isBlockTag(_currentBlockTag) || blockTags.contains(_currentBlockTag)) {
       blockAlignment = _wrapAlignmentForBlockTag(_currentBlockTag);
       textAlign = _textAlignForBlockTag(_currentBlockTag);
     }
